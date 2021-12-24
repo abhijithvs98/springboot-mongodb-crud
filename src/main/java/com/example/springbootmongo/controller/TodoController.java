@@ -23,17 +23,27 @@ import com.example.springbootmongo.model.TodoDTO;
 import com.example.springbootmongo.repository.TodoRepository;
 import com.example.springbootmongo.service.TodoService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/v1/api")
+@Tag(name="Todo") //for swagger
 public class TodoController {
-	
-	@Autowired
-	private TodoRepository todoRepo;
 	
 	@Autowired
 	private TodoService todoService;
 	
 	@GetMapping("/todos")
+	@Operation(summary = "Retreive all todos",
+				responses= {
+						@ApiResponse(description="Retrieve all todos", responseCode="200",
+								content = @Content(mediaType="application/json", schema=@Schema(implementation = TodoDTO.class))),
+						@ApiResponse(description="Todo Not Found ", responseCode="404", content = @Content)	
+				})
 	public ResponseEntity<?> getAllTodos()
 	{
 		List<TodoDTO> todos = todoService.getAllTodos();  
@@ -41,6 +51,7 @@ public class TodoController {
 	}
 	
 	@PostMapping("/todos")
+	@Operation(summary = "Create a new Todo")
 	public ResponseEntity<?> createTodo(@RequestBody TodoDTO todo)
 	{
 		try {
@@ -57,6 +68,7 @@ public class TodoController {
 	}
 	
 	@GetMapping("/todo/{id}")
+	@Operation(summary = "Retrieve a single todo using it's id")
 	public ResponseEntity<?> getSingleTodo(@PathVariable String id){
 		try {
 			return new ResponseEntity<>(todoService.getSingleTodo(id), HttpStatus.OK);
@@ -66,6 +78,7 @@ public class TodoController {
 	}
 	
 	@PutMapping("/todo/{id}")
+	@Operation(summary = "Update a Todo")
 	public ResponseEntity<?> updateTodo(@PathVariable String id, @RequestBody TodoDTO todo){
 		try {
 			todoService.updateTodo(id, todo);
@@ -80,6 +93,7 @@ public class TodoController {
 	
 	
 	@DeleteMapping("/todo/{id}")
+	@Operation(summary = "Delete a todo using id")
 	public ResponseEntity<?> deleteById(@PathVariable String id){
 		try {
 			todoService.deleteById(id);
